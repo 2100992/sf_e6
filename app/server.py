@@ -4,4 +4,4 @@ import bottle
 def index():
     return "hello!"
 
-bottle.run(host="0.0.0.0", port=5000)
+bottle.run(host="127.0.0.1", port=5000)

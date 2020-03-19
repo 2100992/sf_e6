@@ -1,0 +1,40 @@
+version: "2.3"
+
+services:
+    flask_fibo:
+        container_name: flask_fibo
+        image: flask_fibo
+        restart: always
+        build:
+            context: .
+
+    flask_fibo_proxy:
+        container_name: flask_fibo_proxy
+        image: nginx:stable-alpine
+        restart: always
+        depends_on:
+            - flask_fibo
+        environment:
+            CVAT_HOST: localhost
+        ports:
+            - "8080:80"
+        volumes:
+            - ./cvat_proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./cvat_proxy/conf.d/cvat.conf.template:/etc/nginx/conf.d/cvat.conf.template:ro
+        command: /bin/sh -c "envsubst '$$CVAT_HOST' < /etc/nginx/conf.d/cvat.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+
+    cvat_proxy:
+        container_name: cvat_proxy
+        image: nginx:stable-alpine
+        restart: always
+        depends_on:
+            - cvat
+            - cvat_ui
+        environment:
+            CVAT_HOST: localhost
+        ports:
+            - "8080:80"
+        volumes:
+            - ./cvat_proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./cvat_proxy/conf.d/cvat.conf.template:/etc/nginx/conf.d/cvat.conf.template:ro
+        command: /bin/sh -c "envsubst '$$CVAT_HOST' < /etc/nginx/conf.d/cvat.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"

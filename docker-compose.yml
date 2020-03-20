@@ -11,23 +11,33 @@ services:
             DEBUG: "False"
         build:
             context: .
-    
+        networks:
+            my-network:
+                aliases:
+                    - flask-app
+
     memcached: 
         container_name: memcached
         image: memcached
         restart: always
         ports: 
             - "11211:11211"
+        networks: 
+            - my-network
 
     nginx:
-        container_name: flask_fibo_proxy
+        container_name: nginx
         image: nginx:stable-alpine
         restart: always
         depends_on:
             - flask_fibo
         environment:
-            CVAT_HOST: localhost
         ports:
             - "80:80"
         volumes:
             - ./nginx.conf:/etc/nginx/conf.d/default.conf
+        networks: 
+            - my-network
+    
+networks: 
+    my-network:

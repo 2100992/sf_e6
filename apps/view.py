@@ -11,7 +11,7 @@ import functools
 #         return fibo_steroids(n-1) + fibo_steroids(n-2)
 
 
-@functools.lru_cache(maxsize=1280, typed=False)
+# @functools.lru_cache(maxsize=1280, typed=False)
 def new_fibo(n):
 
     fib1 = fib2 = 1

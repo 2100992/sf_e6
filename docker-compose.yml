@@ -31,7 +31,6 @@ services:
         restart: always
         depends_on:
             - flask_fibo
-        environment:
         ports:
             - "80:80"
         volumes:

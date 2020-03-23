@@ -7,14 +7,18 @@ services:
         restart: always
         environment:
             PORT: 5000
-            HOST: 127.0.0.1
+            HOST: 0.0.0.0
             DEBUG: "False"
+            MEMCACHED_SERVER: memcached
+            # MEMCACHED_PORT: 11211
         build:
             context: .
         networks:
             my-network:
                 aliases:
                     - flask-app
+        links: 
+            - memcached
 
     memcached: 
         container_name: memcached

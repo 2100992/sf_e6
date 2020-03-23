@@ -1,28 +1,29 @@
 from apps.app import app
 from flask import render_template
 from flask import request
-import functools
+from apps.memcache_client import client
 
-# @functools.lru_cache(maxsize=1280, typed=False)
-# def fibo_steroids(n):
-#     if n in [0, 1]:
-#         return n
-#     else:
-#         return fibo_steroids(n-1) + fibo_steroids(n-2)
-
-
-# @functools.lru_cache(maxsize=1280, typed=False)
 def new_fibo(n):
+    result = None
+    try:
+        result = client.get(str(n))
+    except:
+        result = None
 
-    fib1 = fib2 = 1
+    if result:
+        return result
+    else:
+        fib1 = fib2 = 1
+        if n in [0,1]:
+            client.set(str(n), str(n))
+            return n
 
-    if n in [0,1]:
-        return n
+        for _ in range(2, n):
+            fib1, fib2 = fib2, fib1 + fib2
 
-    for _ in range(2, n):
-        fib1, fib2 = fib2, fib1 + fib2
 
-    return fib2
+        client.set(str(n), str(fib2))
+        return str(fib2)
 
 
 
@@ -35,14 +36,3 @@ def index():
         k = 0
     fibo = new_fibo(k)
     return render_template('index.html', n=fibo)
-
-
-# @app.route('/<number>')
-# def fibo(number):
-#     fibo = fibo_steroids(int(number))
-#     return render_template('index.html', n=str(fibo))
-
-# @app.route('/new/<number>')
-# def fibo_for(number):
-#     fibo = new_fibo(int(number))
-#     return render_template('index.html', n=str(fibo))
